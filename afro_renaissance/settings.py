@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # Local apps
+    'afro_renaissance.apps.AfroRenaissanceConfig',
     'manifesto.apps.ManifestoConfig',
     'blog.apps.BlogConfig',
     'social.apps.SocialConfig',
