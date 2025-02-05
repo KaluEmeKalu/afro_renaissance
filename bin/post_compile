@@ -8,27 +8,28 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-echo "Project directory contents:"
-ls -la afro_renaissance/
-
 # Install package in development mode
 echo "-----> Installing package in development mode"
-pip install -e .
+python -m pip install -e .
+
+# Verify installation
+echo "-----> Verifying package installation"
+python -c "import afro_renaissance; import blog; import manifesto; import social; print('All packages imported successfully')"
 
 # Create necessary directories
 mkdir -p staticfiles mediafiles
 
 # Run migrations
 echo "-----> Running database migrations"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py migrate --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py collectstatic --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py shell << EOF
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')

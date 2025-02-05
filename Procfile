@@ -1,1 +1,1 @@
-web: cd /app && DJANGO_SETTINGS_MODULE=afro_renaissance.settings gunicorn --pythonpath /app afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --threads 2 --log-level debug --access-logfile - --error-logfile -
+web: cd /app && DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --threads 2 --log-level debug --access-logfile - --error-logfile -
