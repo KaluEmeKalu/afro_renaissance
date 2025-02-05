@@ -1,18 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="afro_renaissance",
     version="1.0.0",
-    packages=find_packages(include=[
-        'afro_renaissance',
-        'afro_renaissance.*',
-        'blog',
-        'blog.*',
-        'manifesto',
-        'manifesto.*',
-        'social',
-        'social.*'
-    ]),
+    packages=['afro_renaissance'],
     include_package_data=True,
     install_requires=[
         line.strip()

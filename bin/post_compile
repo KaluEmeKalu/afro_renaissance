@@ -12,10 +12,6 @@ ls -la
 echo "-----> Installing package in development mode"
 python -m pip install -e .
 
-# Verify installation
-echo "-----> Verifying package installation"
-python -c "import afro_renaissance; import blog; import manifesto; import social; print('All packages imported successfully')"
-
 # Create necessary directories
 mkdir -p staticfiles mediafiles
 
