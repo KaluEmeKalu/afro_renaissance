@@ -8,24 +8,20 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Install package in development mode
-echo "-----> Installing package in development mode"
-pip install -e .
-
 # Create necessary directories
 mkdir -p staticfiles mediafiles
 
 # Run migrations
 echo "-----> Running database migrations"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
+PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
+PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
+PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
