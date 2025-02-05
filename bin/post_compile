@@ -8,36 +8,41 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Print database URL for debugging (masking sensitive info)
-if [ -n "$DATABASE_URL" ]; then
-    echo "DATABASE_URL is set"
-    # Extract host from DATABASE_URL
-    DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\).*/\1/p')
-    echo "Database host: $DB_HOST"
-else
-    echo "WARNING: DATABASE_URL is not set"
-fi
-
 # Create necessary directories
 mkdir -p staticfiles mediafiles
-
-# Run migrations
-echo "-----> Running database migrations"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
 DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
 
-# Create superuser if needed
-echo "-----> Creating superuser if not exists"
-DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
+# Check if database variables are set
+if [ -n "$DB_ID" ] && [ -n "$DB_PASSWORD" ]; then
+    echo "Database environment variables are set"
+    
+    # Print database URL for debugging (masking sensitive info)
+    DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\).*/\1/p')
+    echo "Database host: $DB_HOST"
+
+    # Run migrations
+    echo "-----> Running database migrations"
+    DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
+
+    # Create superuser if needed
+    echo "-----> Creating superuser if not exists"
+    if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+        DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
 from django.contrib.auth.models import User
-if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
-    User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
+if not User.objects.filter(username='$DJANGO_SUPERUSER_USERNAME').exists():
+    User.objects.create_superuser('$DJANGO_SUPERUSER_USERNAME', '${DJANGO_SUPERUSER_EMAIL:-admin@example.com}', '$DJANGO_SUPERUSER_PASSWORD')
     print('Superuser created successfully')
 else:
     print('Superuser already exists')
 EOF
+    else
+        echo "WARNING: Superuser environment variables not set. Skipping superuser creation."
+    fi
+else
+    echo "WARNING: Database environment variables not set. Skipping database operations."
+fi
 
 echo "-----> Post-compile hook completed"
