@@ -9,8 +9,13 @@ services:
     build_command: |
       python -m pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-    run_command: ./scripts/start.sh
+      python manage.py collectstatic --noinput
+      python manage.py migrate --noinput
+      python manage.py shell -c "from django.contrib.auth.models import User; User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', '${DJANGO_SUPERUSER_PASSWORD}')"
+    run_command: gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -
     envs:
+      - key: PYTHONPATH
+        value: "/workspace"
       - key: DJANGO_DEBUG
         value: "False"
       - key: DJANGO_ALLOWED_HOSTS
