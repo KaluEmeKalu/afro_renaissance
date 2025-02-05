@@ -94,25 +94,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 
 # Database configuration
-database_url = os.getenv('DATABASE_URL')
-if not database_url:
-    print("WARNING: DATABASE_URL environment variable is not set!", file=sys.stderr)
-    print("Using default SQLite database for development", file=sys.stderr)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    print(f"Using database URL: {database_url.split('@')[1]}", file=sys.stderr)  # Only print host part
-    DATABASES = {
-        'default': dj_database_url.config(
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=not DEBUG,
-        )
-    }
+DB_ID = os.getenv('DB_ID')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_HOST = os.getenv('DB_HOST', f'db-postgresql-nyc3-{DB_ID}-do-user-{DB_ID}-0.c.db.ondigitalocean.com')
+DB_PORT = os.getenv('DB_PORT', '25060')
+DB_NAME = os.getenv('DB_NAME', 'defaultdb')
+
+if not all([DB_ID, DB_PASSWORD]):
+    print("ERROR: Database environment variables DB_ID and DB_PASSWORD must be set!", file=sys.stderr)
+    sys.exit(1)
+
+DATABASE_URL = f'postgresql://doadmin:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require'
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+        ssl_require=True
+    )
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
