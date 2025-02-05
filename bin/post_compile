@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+echo "-----> Running post-compile hook"
+
+# Create necessary directories
+mkdir -p staticfiles mediafiles
+
+# Run migrations
+echo "-----> Running database migrations"
+python manage.py migrate --noinput
+
+# Collect static files
+echo "-----> Collecting static files"
+python manage.py collectstatic --noinput
+
+# Create superuser if needed
+echo "-----> Creating superuser if not exists"
+python manage.py shell << EOF
+from django.contrib.auth.models import User
+if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
+    User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
+    print('Superuser created successfully')
+else:
+    print('Superuser already exists')
+EOF
+
+echo "-----> Post-compile hook completed"
