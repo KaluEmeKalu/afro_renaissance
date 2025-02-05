@@ -8,20 +8,24 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
+# Set up Python path to include all app directories
+export PYTHONPATH=/app:/app/blog:/app/manifesto:/app/social:$PYTHONPATH
+echo "PYTHONPATH: $PYTHONPATH"
+
 # Create necessary directories
 mkdir -p staticfiles mediafiles
 
 # Run migrations
 echo "-----> Running database migrations"
-PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-PYTHONPATH=/app DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python -m django shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
