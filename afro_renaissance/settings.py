@@ -94,11 +94,22 @@ WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 
 # Database configuration
 DATABASES = {
-    'default': dj_database_url.config(
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'afro_renaissance',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+
+# Update database configuration from DATABASE_URL if available
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
         default=os.getenv('DATABASE_URL'),
         conn_max_age=600
     )
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
