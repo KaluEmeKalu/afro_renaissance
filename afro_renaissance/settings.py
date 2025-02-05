@@ -94,7 +94,11 @@ WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 
 # Database configuration
 DATABASES = {
-    'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
+    'default': dj_database_url.config(
+        default='postgresql://postgres:postgres@localhost:5432/afro_renaissance',
+        conn_max_age=600,
+        ssl_require=False
+    )
 }
 
 # Password validation
