@@ -11,6 +11,9 @@ services:
       pip install -r requirements.txt
       chmod +x scripts/post_deploy.sh
     environment_slug: python
+    env:
+      - key: PYTHONVERSION
+        value: 3.11.7
     run_command: gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:8080
     deploy_on_push:
       post_deploy:
