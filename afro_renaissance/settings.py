@@ -94,26 +94,35 @@ TEMPLATES = [
 WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 
 # Database configuration
-DB_ID = os.getenv('DB_ID')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_HOST = os.getenv('DB_HOST', f'db-postgresql-nyc3-{DB_ID}-do-user-{DB_ID}-0.c.db.ondigitalocean.com')
-DB_PORT = os.getenv('DB_PORT', '25060')
-DB_NAME = os.getenv('DB_NAME', 'defaultdb')
+# Skip database configuration if running collectstatic
+if 'collectstatic' not in sys.argv:
+    DB_ID = os.getenv('DB_ID')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_HOST = os.getenv('DB_HOST', f'db-postgresql-nyc3-{DB_ID}-do-user-{DB_ID}-0.c.db.ondigitalocean.com')
+    DB_PORT = os.getenv('DB_PORT', '25060')
+    DB_NAME = os.getenv('DB_NAME', 'defaultdb')
 
-if not all([DB_ID, DB_PASSWORD]):
-    print("ERROR: Database environment variables DB_ID and DB_PASSWORD must be set!", file=sys.stderr)
-    sys.exit(1)
+    if not all([DB_ID, DB_PASSWORD]):
+        print("ERROR: Database environment variables DB_ID and DB_PASSWORD must be set!", file=sys.stderr)
+        sys.exit(1)
 
-DATABASE_URL = f'postgresql://doadmin:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require'
+    DATABASE_URL = f'postgresql://doadmin:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require'
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True
-    )
-}
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:'
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
