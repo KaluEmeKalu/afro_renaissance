@@ -3,24 +3,30 @@ set -eo pipefail
 
 echo "-----> Running post-compile hook"
 
-# Get the directory where the script is located
-BUILD_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-echo "Build directory: $BUILD_DIR"
+# Use the app directory provided by the buildpack
+APP_DIR="/app"
+echo "App directory: $APP_DIR"
+
+# Add app directory to Python path
+export PYTHONPATH=$APP_DIR:$PYTHONPATH
 
 # Create necessary directories
-mkdir -p $BUILD_DIR/staticfiles $BUILD_DIR/mediafiles
+mkdir -p $APP_DIR/staticfiles $APP_DIR/mediafiles
+
+# Change to app directory
+cd $APP_DIR
 
 # Run migrations
 echo "-----> Running database migrations"
-python $BUILD_DIR/manage.py migrate --noinput
+python manage.py migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-python $BUILD_DIR/manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-python $BUILD_DIR/manage.py shell << EOF
+python manage.py shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
