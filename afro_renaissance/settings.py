@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'afro_renaissance.middleware.RequestLoggingMiddleware',  # Add request logging
 ]
 
 # CORS and CSRF settings
