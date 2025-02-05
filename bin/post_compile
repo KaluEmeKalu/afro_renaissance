@@ -8,9 +8,9 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Install package in development mode
+# Install package in development mode with PEP 517
 echo "-----> Installing package in development mode"
-python -m pip install -e .
+python -m pip install --use-pep517 -e .
 
 # Create necessary directories
 mkdir -p staticfiles mediafiles
