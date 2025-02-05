@@ -8,23 +8,72 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-echo "Parent directory contents:"
-ls -la ..
+echo "Project directory contents:"
+ls -la afro_renaissance/
 
-echo "Root directory contents:"
-ls -la /
-
-echo "Checking Python path:"
+echo "Python path:"
 which python
 python --version
 
-echo "Checking if we're in a virtualenv:"
-python -c "import sys; print('Virtual env:', hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))"
+echo "PYTHONPATH: $PYTHONPATH"
+echo "HOME: $HOME"
 
-# Try to locate our application files
-echo "Looking for Django files:"
-find . -name "wsgi.py" -o -name "manage.py" -o -name "settings.py" 2>/dev/null
+echo "All Python files in current directory:"
+find . -name "*.py" -maxdepth 2
 
-# Exit early for now to inspect the environment
-echo "Exiting early to inspect environment"
-exit 1
+echo "All files in current directory (recursive):"
+find . -type f
+
+echo "Checking if manage.py exists:"
+if [ -f "manage.py" ]; then
+    echo "manage.py found in current directory"
+else
+    echo "manage.py not found in current directory"
+    echo "Creating manage.py..."
+    cat > manage.py << 'EOF'
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'afro_renaissance.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+if __name__ == '__main__':
+    main()
+EOF
+    chmod +x manage.py
+    echo "Created manage.py"
+fi
+
+# Create necessary directories
+mkdir -p staticfiles mediafiles
+
+# Run migrations
+echo "-----> Running database migrations"
+python manage.py migrate --noinput
+
+# Collect static files
+echo "-----> Collecting static files"
+python manage.py collectstatic --noinput
+
+# Create superuser if needed
+echo "-----> Creating superuser if not exists"
+python manage.py shell << EOF
+from django.contrib.auth.models import User
+if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
+    User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
+    print('Superuser created successfully')
+else:
+    print('Superuser already exists')
+EOF
+
+echo "-----> Post-compile hook completed"
