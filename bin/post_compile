@@ -8,9 +8,9 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Set up Python path to include all app directories
-export PYTHONPATH=/app:/app/blog:/app/manifesto:/app/social:$PYTHONPATH
-echo "PYTHONPATH: $PYTHONPATH"
+# Install package in development mode
+echo "-----> Installing package in development mode"
+pip install -e .
 
 # Create necessary directories
 mkdir -p staticfiles mediafiles
