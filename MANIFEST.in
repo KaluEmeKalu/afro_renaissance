@@ -1,7 +1,10 @@
 include manage.py
+include requirements.txt
 recursive-include afro_renaissance *
 recursive-include blog *
 recursive-include manifesto *
 recursive-include social *
 recursive-include templates *
 recursive-include static *
+recursive-include mediafiles *
+recursive-include staticfiles *
