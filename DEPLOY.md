@@ -7,22 +7,16 @@
 ## Configuration Files
 The project includes several configuration files for deployment:
 
-1. `Dockerfile.do`: Custom Dockerfile for DigitalOcean deployment
-   - Uses Python 3.13
-   - Sets up proper environment variables
-   - Handles static files and migrations
-   - Uses Gunicorn configuration
+1. `Procfile`: Defines the command to run the application
+   - Uses Gunicorn as the WSGI server
+   - Sets proper worker configuration
+   - Enables debug logging
 
-2. `python.config`: Python runtime configuration
-   - Specifies Python version
-   - Sets entry point
-   - Configures environment variables
-
-3. `gunicorn.conf.py`: Gunicorn server configuration
-   - Sets up Python path
-   - Configures workers and threads
-   - Handles logging
-   - Pre-loads WSGI application
+2. `bin/post_compile`: Post-deployment script
+   - Creates necessary directories
+   - Runs database migrations
+   - Collects static files
+   - Creates superuser if needed
 
 ## Deployment Steps
 
@@ -32,19 +26,7 @@ The project includes several configuration files for deployment:
    - Select your GitHub repository
    - Choose the branch to deploy (main)
 
-2. Configure Build Settings:
-   - In the build phase section, you'll see three buildpacks:
-     1. Python Buildpack
-     2. Procfile Buildpack
-     3. Custom Build Command Buildpack
-   - Click "Edit" on the Custom Build Command Buildpack
-   - In the "Build Command" field, enter:
-     ```
-     docker build -f Dockerfile.do -t app .
-     ```
-   - Click "Save"
-
-3. Configure Environment Variables:
+2. Configure Environment Variables:
    ```
    DJANGO_DEBUG=False
    DJANGO_ALLOWED_HOSTS=${APP_DOMAIN}
@@ -54,20 +36,18 @@ The project includes several configuration files for deployment:
    DJANGO_SUPERUSER_PASSWORD=[choose a strong password]
    ```
 
-4. Add Database:
+3. Add Database:
    - Click "Add Resource"
    - Choose "Database"
    - Select "Dev Database"
    - The DATABASE_URL will be automatically added to your environment
 
-5. Deploy:
+4. Deploy:
    - Click "Deploy to Production"
    - The deployment process will:
-     * Build using Dockerfile.do
-     * Install dependencies
-     * Run database migrations
-     * Create superuser
-     * Collect static files
+     * Install Python dependencies
+     * Run post_compile script
+     * Start the application using Procfile
 
 ## Monitoring
 
@@ -78,22 +58,28 @@ The project includes several configuration files for deployment:
 ## Troubleshooting
 
 1. Check the application logs for any errors:
-   - The Gunicorn configuration includes debug-level logging
-   - All output is directed to stdout/stderr for easy viewing
+   - Gunicorn logs will show startup issues
+   - Django logs will show application errors
+   - post_compile script logs will show initialization issues
 
 2. Common issues:
    - If the app fails to start, check the environment variables
-   - If static files are missing, verify the collectstatic command ran successfully
-   - If database errors occur, ensure migrations completed successfully
-   - If build fails, verify the build command is correctly set
+   - If static files are missing, check post_compile script logs
+   - If database errors occur, verify migrations completed
+   - If buildpack fails, check requirements.txt is valid
 
 3. Deployment logs:
-   - Review build logs for any dependency installation issues
-   - Check runtime logs for application startup problems
-   - Monitor database connection errors in the logs
+   - Review build logs for dependency installation issues
+   - Check post_compile script output for initialization problems
+   - Monitor database connection errors
+   - Verify Procfile is being detected and used
 
-4. Build Command Issues:
-   - Ensure the build command is exactly as specified above
-   - Check that Dockerfile.do exists in the root of your repository
-   - Verify the Docker build command completes successfully
-   - Look for any Docker build errors in the logs
+4. File Permissions:
+   - Ensure bin/post_compile is executable (chmod +x)
+   - Check directory permissions for staticfiles and mediafiles
+   - Verify database user has proper permissions
+
+5. Environment Variables:
+   - All required variables must be set
+   - DATABASE_URL should be automatically configured
+   - DJANGO_ALLOWED_HOSTS must include app domain
