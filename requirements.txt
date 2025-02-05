@@ -3,7 +3,6 @@ psycopg2-binary==2.9.9
 python-dotenv==1.0.0
 django-crispy-forms==2.1
 crispy-bootstrap5==2023.10
-Pillow==9.3.0  # Using an older version known to work with Python 3.13
 django-ckeditor==6.7.0
 django-taggit==5.0.1
 gunicorn==21.2.0
