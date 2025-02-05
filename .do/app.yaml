@@ -7,8 +7,10 @@ services:
       deploy_on_push: true
       repo: KaluEmeKalu/afro_renaissance
     build_command: |
+      apt-get update && apt-get install -y python3-dev libjpeg-dev zlib1g-dev
       pip install -r requirements.txt
       chmod +x scripts/post_deploy.sh
+    environment_slug: python
     run_command: gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:8080
     deploy_on_push:
       post_deploy:
