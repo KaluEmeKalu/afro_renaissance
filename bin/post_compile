@@ -3,30 +3,41 @@ set -eo pipefail
 
 echo "-----> Running post-compile hook"
 
-# Use the app directory provided by the buildpack
-APP_DIR="/app"
-echo "App directory: $APP_DIR"
-
-# Add app directory to Python path
-export PYTHONPATH=$APP_DIR:$PYTHONPATH
+# Print environment for debugging
+echo "Current directory: $(pwd)"
+echo "HOME: $HOME"
+echo "PYTHONPATH: $PYTHONPATH"
+echo "Listing directory contents:"
+ls -la
 
 # Create necessary directories
-mkdir -p $APP_DIR/staticfiles $APP_DIR/mediafiles
+mkdir -p staticfiles mediafiles
 
-# Change to app directory
-cd $APP_DIR
+# Find manage.py
+MANAGE_PATH="./manage.py"
+if [ ! -f "$MANAGE_PATH" ]; then
+    echo "Looking for manage.py in parent directory..."
+    MANAGE_PATH="../manage.py"
+fi
+
+if [ ! -f "$MANAGE_PATH" ]; then
+    echo "Error: Could not find manage.py"
+    exit 1
+fi
+
+echo "Found manage.py at: $MANAGE_PATH"
 
 # Run migrations
 echo "-----> Running database migrations"
-python manage.py migrate --noinput
+python $MANAGE_PATH migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-python manage.py collectstatic --noinput
+python $MANAGE_PATH collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-python manage.py shell << EOF
+python $MANAGE_PATH shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
