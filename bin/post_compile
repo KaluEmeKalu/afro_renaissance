@@ -11,34 +11,24 @@ ls -la
 echo "Project directory contents:"
 ls -la afro_renaissance/
 
-# Ensure we're in the correct directory
-if [ ! -f "manage.py" ]; then
-    echo "Error: manage.py not found in current directory"
-    echo "Contents of /app:"
-    ls -la /app
-    echo "Contents of /workspace:"
-    ls -la /workspace
-    exit 1
-fi
-
-# Add the current directory to PYTHONPATH
-export PYTHONPATH=/app:$PYTHONPATH
-echo "Updated PYTHONPATH: $PYTHONPATH"
+# Install package in development mode
+echo "-----> Installing package in development mode"
+pip install -e .
 
 # Create necessary directories
 mkdir -p staticfiles mediafiles
 
 # Run migrations
 echo "-----> Running database migrations"
-python manage.py migrate --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py migrate --noinput
 
 # Collect static files
 echo "-----> Collecting static files"
-python manage.py collectstatic --noinput
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py collectstatic --noinput
 
 # Create superuser if needed
 echo "-----> Creating superuser if not exists"
-python manage.py shell << EOF
+DJANGO_SETTINGS_MODULE=afro_renaissance.settings python manage.py shell << EOF
 from django.contrib.auth.models import User
 if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
     User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
