@@ -11,8 +11,18 @@ ls -la
 echo "Project directory contents:"
 ls -la afro_renaissance/
 
+# Ensure we're in the correct directory
+if [ ! -f "manage.py" ]; then
+    echo "Error: manage.py not found in current directory"
+    echo "Contents of /app:"
+    ls -la /app
+    echo "Contents of /workspace:"
+    ls -la /workspace
+    exit 1
+fi
+
 # Add the current directory to PYTHONPATH
-export PYTHONPATH=$(pwd):$PYTHONPATH
+export PYTHONPATH=/app:$PYTHONPATH
 echo "Updated PYTHONPATH: $PYTHONPATH"
 
 # Create necessary directories
