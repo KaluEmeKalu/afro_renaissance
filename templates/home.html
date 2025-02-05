@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Afro-Renaissance - Africa's Rebirth through Human Capital Development{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section pattern-bg py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center fade-in">
+                <h1 class="hero-title mb-4">Afro-Renaissance Movement</h1>
+                <p class="lead mb-4">A transformative movement for economic and social rebirth powered by the talents of our people.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'manifesto:home' %}" class="btn btn-primary">Read the Manifesto</a>
+                    <a href="{% url 'account_signup' %}" class="btn btn-outline-primary">Join the Movement</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Points Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4 fade-in">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                        <h3>Education & Skills</h3>
+                        <p>Empowering Africa through knowledge and skill development, creating a generation of innovators and leaders.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-lightbulb fa-3x text-primary mb-3"></i>
+                        <h3>Innovation</h3>
+                        <p>Fostering creativity and technological advancement to solve Africa's unique challenges.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-hands-helping fa-3x text-primary mb-3"></i>
+                        <h3>Unity</h3>
+                        <p>Building a collaborative network across Africa and the diaspora for collective progress.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Blog Posts -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Latest Discussions</h2>
+        <div class="row">
+            {% for blog_post in latest_posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if blog_post.image %}
+                    <img src="{{ blog_post.image.url }}" class="card-img-top" alt="{{ blog_post.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ blog_post.title }}</h5>
+                        <p class="card-text">{{ blog_post.excerpt }}</p>
+                        <a href="{% url 'blog:detail' blog_post.slug %}" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No blog posts yet. Stay tuned!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Social Feed Preview -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Join the Conversation</h2>
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="social-feed">
+                    {% if latest_social_posts %}
+                        {% for social_post in latest_social_posts %}
+                        <div class="post">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{% static 'images/default-avatar.png' %}"
+                                     alt="{{ social_post.author.username|default:'Anonymous' }}"
+                                     class="rounded-circle me-2"
+                                     style="width: 40px; height: 40px;">
+                               <div>
+                                   <h6 class="mb-0">{{ social_post.author.username|default:'Anonymous' }}</h6>
+                                   <small class="text-muted">{{ social_post.created_at|timesince }} ago</small>
+                               </div>
+                           </div>
+                           <p>{{ social_post.content }}</p>
+                           <div class="d-flex gap-3">
+                               <button class="btn btn-sm btn-outline-primary">
+                                   <i class="far fa-heart"></i> {{ social_post.likes.count|default:"0" }}
+                               </button>
+                               <button class="btn btn-sm btn-outline-primary">
+                                   <i class="far fa-comment"></i> {{ social_post.comments.count|default:"0" }}
+                               </button>
+                           </div>
+                       </div>
+                    {% empty %}
+                    <p class="text-center">No social posts yet. Be the first to share!</p>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'social:feed' %}" class="btn btn-primary">View Full Social Feed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Be Part of Africa's Renaissance</h2>
+        <p class="lead mb-4">Join us in building a future where Africa's potential is fully realized through education, innovation, and collaboration.</p>
+        <a href="{% url 'account_signup' %}" class="btn btn-light btn-lg">Join the Movement Today</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Intersection Observer for fade-in animations
+    const fadeElements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+    
+    fadeElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(element);
+    });
+</script>
+{% endblock %}

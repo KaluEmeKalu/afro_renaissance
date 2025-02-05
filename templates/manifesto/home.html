@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Afro-Renaissance Manifesto{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="manifesto-section">
+    <div class="container">
+        <div class="row justify-content-center text-center mb-5">
+            <div class="col-lg-8">
+                <h1 class="hero-title mb-4">Afro-Renaissance Manifesto</h1>
+                <p class="lead">Africa's Rebirth through Human Capital Development</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Points -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            {% for point in key_points %}
+            <div class="col-md-4 fade-in">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas {{ point.icon }} fa-3x text-primary mb-3"></i>
+                        <h3>{{ point.title }}</h3>
+                        <p>{{ point.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Manifesto Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Table of Contents -->
+            <div class="col-lg-3">
+                <div class="card sticky-top" style="top: 2rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Table of Contents</h5>
+                        <nav class="nav flex-column">
+                            {% for section in sections %}
+                            <a class="nav-link" href="#section-{{ section.slug }}">
+                                {{ section.title }}
+                            </a>
+                            {% endfor %}
+                        </nav>
+                        <div class="mt-4">
+                            <a href="{% url 'manifesto:pdf' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                {% for section in sections %}
+                <article id="section-{{ section.slug }}" class="mb-5">
+                    <h2 class="mb-4">{{ section.title }}</h2>
+                    <div class="manifesto-content">
+                        {{ section.content|safe }}
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-5">
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+{% if call_to_action %}
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">{{ call_to_action.title }}</h2>
+        <p class="lead mb-4">{{ call_to_action.description }}</p>
+        <a href="{{ call_to_action.button_link }}" class="btn btn-light btn-lg">
+            {{ call_to_action.button_text }}
+        </a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Smooth scrolling for table of contents links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const section = document.querySelector(this.getAttribute('href'));
+            const yOffset = -100; // Adjust for fixed header
+            const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({top: y, behavior: 'smooth'});
+        });
+    });
+
+    // Highlight current section in table of contents
+    const sections = document.querySelectorAll('article');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (window.pageYOffset >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

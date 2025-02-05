@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - Afro-Renaissance{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Conversations List -->
+                        <div class="col-lg-4 border-end">
+                            <div class="p-3 border-bottom">
+                                <h5 class="mb-0">Messages</h5>
+                            </div>
+                            <div class="conversations-list">
+                                {% for user in users %}
+                                <a href="{% url 'social:conversation' user.username %}" 
+                                   class="conversation-item d-flex align-items-center p-3 border-bottom text-decoration-none {% if active_conversation == user %}active{% endif %}">
+                                    <img src="{{ user.profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                                         alt="{{ user.username }}" 
+                                         class="rounded-circle me-3"
+                                         style="width: 48px; height: 48px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ user.get_full_name|default:user.username }}</h6>
+                                        <small class="text-muted">@{{ user.username }}</small>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="p-4 text-center text-muted">
+                                    <p class="mb-0">No conversations yet</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Messages Area -->
+                        <div class="col-lg-8">
+                            {% if active_conversation %}
+                            <!-- Conversation Header -->
+                            <div class="p-3 border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ active_conversation.profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                                         alt="{{ active_conversation.username }}" 
+                                         class="rounded-circle me-3"
+                                         style="width: 48px; height: 48px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-1">{{ active_conversation.get_full_name|default:active_conversation.username }}</h6>
+                                        <small class="text-muted">@{{ active_conversation.username }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Messages List -->
+                            <div class="messages-list p-3" id="messages-container" style="height: 400px; overflow-y: auto;">
+                                {% for message in messages %}
+                                <div class="message mb-3 {% if message.sender == user %}message-sent{% else %}message-received{% endif %}">
+                                    <div class="message-content p-3 rounded {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                        {{ message.content }}
+                                        <div class="message-time">
+                                            <small class="{% if message.sender == user %}text-white-50{% else %}text-muted{% endif %}">
+                                                {{ message.created_at|date:"g:i A" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Message Input -->
+                            <div class="p-3 border-top">
+                                <form id="message-form" data-username="{{ active_conversation.username }}">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        {{ message_form.content }}
+                                        <button type="submit" class="btn btn-primary">Send</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <p>Select a conversation to start messaging</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        const container = document.getElementById('messages-container');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+
+    // Initial scroll
+    document.addEventListener('DOMContentLoaded', scrollToBottom);
+
+    // Handle message submission
+    $('#message-form').submit(function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const username = form.data('username');
+        const input = form.find('textarea');
+        const content = input.val().trim();
+        
+        if (content) {
+            $.post(`/social/messages/${username}/send/`, {
+                'content': content,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            })
+            .done(function(data) {
+                if (data.status === 'success') {
+                    // Add new message to the list
+                    const messageHtml = `
+                        <div class="message mb-3 message-sent">
+                            <div class="message-content p-3 rounded bg-primary text-white">
+                                ${data.message.content}
+                                <div class="message-time">
+                                    <small class="text-white-50">${data.message.created_at}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#messages-container').append(messageHtml);
+                    input.val('');
+                    scrollToBottom();
+                }
+            });
+        }
+    });
+
+    // Style active conversation
+    $('.conversation-item').click(function() {
+        $('.conversation-item').removeClass('active');
+        $(this).addClass('active');
+    });
+</script>
+{% endblock %}

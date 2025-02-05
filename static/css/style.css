@@ -1,0 +1,225 @@
+:root {
+    /* African-inspired color palette */
+    --primary-color: #E94E1B;    /* Vibrant Orange */
+    --secondary-color: #1B1B1B;  /* Rich Black */
+    --accent-color: #FFB400;     /* Gold */
+    --text-color: #333333;
+    --light-color: #F5F5F5;
+    --pattern-color: #D4AF37;    /* African Gold */
+    
+    /* Typography */
+    --heading-font: 'Montserrat', sans-serif;
+    --body-font: 'Open Sans', sans-serif;
+}
+
+/* African Pattern Background */
+.pattern-bg {
+    background-image: linear-gradient(45deg, var(--pattern-color) 25%, transparent 25%),
+                      linear-gradient(-45deg, var(--pattern-color) 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, var(--pattern-color) 75%),
+                      linear-gradient(-45deg, transparent 75%, var(--pattern-color) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    opacity: 0.1;
+}
+
+body {
+    font-family: var(--body-font);
+    color: var(--text-color);
+    line-height: 1.6;
+    background-color: var(--light-color);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Navigation */
+.navbar {
+    background-color: var(--secondary-color);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    color: var(--accent-color) !important;
+    font-family: var(--heading-font);
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: var(--light-color) !important;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Profile Styles */
+.profile-cover {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 4px solid white;
+    margin-top: -75px;
+}
+
+.profile-stats {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+    margin: 1rem 0;
+}
+
+.profile-bio {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.profile-info {
+    margin-top: -100px;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-header {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Social Feed Styles */
+.post {
+    margin-bottom: 1.5rem;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+
+.post-content {
+    margin-bottom: 1rem;
+}
+
+.post-image {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+/* Comments */
+.comment {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .navbar {
+        padding: 0.5rem 0;
+    }
+    
+    .profile-cover {
+        height: 200px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 1s ease forwards;
+}

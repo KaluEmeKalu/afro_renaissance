@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Afro-Renaissance{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Notifications</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for notification in notifications %}
+                    <div class="notification-item p-3 border-bottom {% if not notification.read %}bg-light{% endif %}">
+                        <div class="d-flex">
+                            <!-- Sender Avatar -->
+                            <img src="{{ notification.sender.profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                                 alt="{{ notification.sender.username }}" 
+                                 class="rounded-circle me-3"
+                                 style="width: 48px; height: 48px; object-fit: cover;">
+                            
+                            <!-- Notification Content -->
+                            <div class="flex-grow-1">
+                                <div class="notification-content">
+                                    {% if notification.notification_type == 'like' %}
+                                    <a href="{% url 'social:profile' notification.sender.username %}" class="text-decoration-none">
+                                        <strong>{{ notification.sender.get_full_name|default:notification.sender.username }}</strong>
+                                    </a>
+                                    liked your 
+                                    <a href="{% url 'social:post_detail' notification.post.id %}" class="text-decoration-none">post</a>
+                                    
+                                    {% elif notification.notification_type == 'comment' %}
+                                    <a href="{% url 'social:profile' notification.sender.username %}" class="text-decoration-none">
+                                        <strong>{{ notification.sender.get_full_name|default:notification.sender.username }}</strong>
+                                    </a>
+                                    commented on your 
+                                    <a href="{% url 'social:post_detail' notification.post.id %}" class="text-decoration-none">post</a>
+                                    
+                                    {% elif notification.notification_type == 'follow' %}
+                                    <a href="{% url 'social:profile' notification.sender.username %}" class="text-decoration-none">
+                                        <strong>{{ notification.sender.get_full_name|default:notification.sender.username }}</strong>
+                                    </a>
+                                    started following you
+                                    
+                                    {% elif notification.notification_type == 'mention' %}
+                                    <a href="{% url 'social:profile' notification.sender.username %}" class="text-decoration-none">
+                                        <strong>{{ notification.sender.get_full_name|default:notification.sender.username }}</strong>
+                                    </a>
+                                    mentioned you in a 
+                                    <a href="{% url 'social:post_detail' notification.post.id %}" class="text-decoration-none">post</a>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Notification Time -->
+                                <small class="text-muted">
+                                    {{ notification.created_at|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-bell fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No notifications yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if notifications.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if notifications.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ notifications.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in notifications.paginator.page_range %}
+                    <li class="page-item {% if notifications.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if notifications.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ notifications.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mark notifications as read when clicked
+    $('.notification-item').click(function() {
+        $(this).removeClass('bg-light');
+    });
+</script>
+{% endblock %}

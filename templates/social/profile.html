@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.user.get_full_name|default:profile.user.username }} - Afro-Renaissance{% endblock %}
+
+{% block content %}
+<!-- Cover Image -->
+<div class="profile-cover" data-cover="{{ profile.cover_image.url|default:'static/images/default-cover.jpg' }}"></div>
+
+<!-- Profile Info -->
+<div class="container profile-info">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="profile-header">
+                <div class="d-flex align-items-end mb-4">
+                    <!-- Profile Picture -->
+                    <img src="{{ profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                         alt="{{ profile.user.username }}" 
+                         class="rounded-circle profile-avatar">
+                    
+                    <!-- Profile Actions -->
+                    <div class="ms-4 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-1">{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+                                <p class="text-muted mb-0">@{{ profile.user.username }}</p>
+                            </div>
+                            <div>
+                                {% if user.is_authenticated and user != profile.user %}
+                                <button class="btn btn-primary follow-btn" data-username="{{ profile.user.username }}">
+                                    {% if user in profile.followers.all %}
+                                        Following
+                                    {% else %}
+                                        Follow
+                                    {% endif %}
+                                </button>
+                                <a href="{% url 'social:conversation' profile.user.username %}" class="btn btn-outline-primary">
+                                    Message
+                                </a>
+                                {% elif user == profile.user %}
+                                <a href="{% url 'social:edit_profile' %}" class="btn btn-outline-primary">
+                                    Edit Profile
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Stats -->
+                <div class="profile-stats">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h4 class="mb-0">{{ profile.user.social_posts.count }}</h4>
+                            <small class="text-muted">Posts</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="mb-0 followers-count">{{ profile.get_followers_count }}</h4>
+                            <small class="text-muted">Followers</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="mb-0">{{ profile.get_following_count }}</h4>
+                            <small class="text-muted">Following</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Bio -->
+                {% if profile.bio %}
+                <div class="profile-bio">
+                    {{ profile.bio }}
+                </div>
+                {% endif %}
+
+                <!-- Profile Details -->
+                <div class="mt-4">
+                    {% if profile.location %}
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        {{ profile.location }}
+                    </p>
+                    {% endif %}
+                    {% if profile.website %}
+                    <p class="mb-2">
+                        <i class="fas fa-link text-primary me-2"></i>
+                        <a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer">
+                            {{ profile.website }}
+                        </a>
+                    </p>
+                    {% endif %}
+                    <p class="mb-0">
+                        <i class="fas fa-calendar text-primary me-2"></i>
+                        Joined {{ profile.created_at|date:"F Y" }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Posts Navigation -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#posts" data-bs-toggle="tab">Posts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#media" data-bs-toggle="tab">Media</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#likes" data-bs-toggle="tab">Likes</a>
+                </li>
+            </ul>
+
+            <!-- Posts Content -->
+            <div class="tab-content">
+                <!-- Posts Tab -->
+                <div class="tab-pane fade show active" id="posts">
+                    {% for post in posts %}
+                    <div class="card post">
+                        <div class="card-body">
+                            <div class="post-header">
+                                <img src="{{ post.author.profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                                     alt="{{ post.author.username }}" 
+                                     class="post-avatar">
+                                <div>
+                                    <h6 class="mb-0">{{ post.author.get_full_name|default:post.author.username }}</h6>
+                                    <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                {{ post.content }}
+                            </div>
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+                            {% endif %}
+                            <div class="post-actions">
+                                <button class="btn btn-outline-primary like-btn" data-post-id="{{ post.id }}">
+                                    <i class="fas fa-heart{% if user in post.likes.all %} text-danger{% endif %}"></i>
+                                    <span class="like-count">{{ post.likes.count }}</span>
+                                </button>
+                                <button class="btn btn-outline-primary">
+                                    <i class="fas fa-comment"></i>
+                                    {{ post.comments.count }}
+                                </button>
+                                <button class="btn btn-outline-primary share-btn" data-post-id="{{ post.id }}">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No posts yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Media Tab -->
+                <div class="tab-pane fade" id="media">
+                    <div class="row g-3">
+                        {% for post in posts %}
+                        {% if post.image %}
+                        <div class="col-md-4">
+                            <img src="{{ post.image.url }}" alt="Post media" class="img-fluid rounded">
+                        </div>
+                        {% endif %}
+                        {% empty %}
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No media posts yet</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Likes Tab -->
+                <div class="tab-pane fade" id="likes">
+                    {% for post in profile.user.liked_posts.all %}
+                    <div class="card post">
+                        <div class="card-body">
+                            <div class="post-header">
+                                <img src="{{ post.author.profile.avatar.url|default:'static/images/default-avatar.png' }}" 
+                                     alt="{{ post.author.username }}" 
+                                     class="post-avatar">
+                                <div>
+                                    <h6 class="mb-0">{{ post.author.get_full_name|default:post.author.username }}</h6>
+                                    <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                {{ post.content }}
+                            </div>
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No liked posts yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set cover image background
+    document.addEventListener('DOMContentLoaded', function() {
+        const coverElement = document.querySelector('.profile-cover');
+        if (coverElement) {
+            const coverUrl = coverElement.dataset.cover;
+            coverElement.style.backgroundImage = `url('${coverUrl}')`;
+        }
+    });
+
+    // Follow functionality
+    $('.follow-btn').click(function() {
+        const username = $(this).data('username');
+        const btn = $(this);
+        
+        $.post(`/social/profile/${username}/follow/`, {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(data) {
+            btn.text(data.following ? 'Following' : 'Follow');
+            $('.followers-count').text(data.follower_count);
+        });
+    });
+
+    // Like functionality
+    $('.like-btn').click(function() {
+        const postId = $(this).data('post-id');
+        const btn = $(this);
+        
+        $.post(`/social/post/${postId}/like/`, {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(data) {
+            const icon = btn.find('i');
+            icon.toggleClass('text-danger');
+            btn.find('.like-count').text(data.count);
+        });
+    });
+
+    // Share functionality
+    $('.share-btn').click(function() {
+        const postId = $(this).data('post-id');
+        const postUrl = window.location.origin + `/social/post/${postId}/`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Afro-Renaissance Post',
+                url: postUrl
+            });
+        } else {
+            navigator.clipboard.writeText(postUrl).then(function() {
+                alert('Post URL copied to clipboard!');
+            });
+        }
+    });
+</script>
+{% endblock %}

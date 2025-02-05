@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ section.title }} - Afro-Renaissance Manifesto{% endblock %}
+
+{% block content %}
+<!-- Section Hero -->
+<section class="manifesto-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title mb-4">{{ section.title }}</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="{% url 'manifesto:home' %}">Manifesto</a></li>
+                        <li class="breadcrumb-item active">{{ section.title }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <article class="manifesto-content">
+                    {{ section.content|safe }}
+                </article>
+
+                <!-- Section Navigation -->
+                <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                    {% if previous_section %}
+                    <a href="{% url 'manifesto:section_detail' previous_section.slug %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        {{ previous_section.title }}
+                    </a>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+
+                    {% if next_section %}
+                    <a href="{% url 'manifesto:section_detail' next_section.slug %}" class="btn btn-outline-primary">
+                        {{ next_section.title }}
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Points Related to Section -->
+{% if section.key_points.exists %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Key Points</h2>
+        <div class="row g-4">
+            {% for point in section.key_points.all %}
+            <div class="col-md-4 fade-in">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas {{ point.icon }} fa-3x text-primary mb-3"></i>
+                        <h3>{{ point.title }}</h3>
+                        <p>{{ point.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+{% if call_to_action %}
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">{{ call_to_action.title }}</h2>
+        <p class="lead mb-4">{{ call_to_action.description }}</p>
+        <a href="{{ call_to_action.button_link }}" class="btn btn-light btn-lg">
+            {{ call_to_action.button_text }}
+        </a>
+    </div>
+</section>
+{% endif %}
+
+<!-- Share Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="mb-4">Share this Section</h3>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ section.title }}" 
+                       class="btn btn-outline-primary" target="_blank">
+                        <i class="fab fa-twitter me-2"></i>Twitter
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                       class="btn btn-outline-primary" target="_blank">
+                        <i class="fab fa-facebook me-2"></i>Facebook
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ section.title }}" 
+                       class="btn btn-outline-primary" target="_blank">
+                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Fade in animation for key points
+    const fadeElements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+    
+    fadeElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(element);
+    });
+</script>
+{% endblock %}
