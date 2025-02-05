@@ -31,9 +31,20 @@ The project includes several configuration files for deployment:
    - Click "Create App"
    - Select your GitHub repository
    - Choose the branch to deploy (main)
-   - Specify `Dockerfile.do` as the Dockerfile path
 
-2. Configure Environment Variables:
+2. Configure Build Settings:
+   - In the build phase section, you'll see three buildpacks:
+     1. Python Buildpack
+     2. Procfile Buildpack
+     3. Custom Build Command Buildpack
+   - Click "Edit" on the Custom Build Command Buildpack
+   - In the "Build Command" field, enter:
+     ```
+     docker build -f Dockerfile.do -t app .
+     ```
+   - Click "Save"
+
+3. Configure Environment Variables:
    ```
    DJANGO_DEBUG=False
    DJANGO_ALLOWED_HOSTS=${APP_DOMAIN}
@@ -43,15 +54,16 @@ The project includes several configuration files for deployment:
    DJANGO_SUPERUSER_PASSWORD=[choose a strong password]
    ```
 
-3. Add Database:
+4. Add Database:
    - Click "Add Resource"
    - Choose "Database"
    - Select "Dev Database"
    - The DATABASE_URL will be automatically added to your environment
 
-4. Deploy:
+5. Deploy:
    - Click "Deploy to Production"
    - The deployment process will:
+     * Build using Dockerfile.do
      * Install dependencies
      * Run database migrations
      * Create superuser
@@ -73,8 +85,15 @@ The project includes several configuration files for deployment:
    - If the app fails to start, check the environment variables
    - If static files are missing, verify the collectstatic command ran successfully
    - If database errors occur, ensure migrations completed successfully
+   - If build fails, verify the build command is correctly set
 
 3. Deployment logs:
    - Review build logs for any dependency installation issues
    - Check runtime logs for application startup problems
    - Monitor database connection errors in the logs
+
+4. Build Command Issues:
+   - Ensure the build command is exactly as specified above
+   - Check that Dockerfile.do exists in the root of your repository
+   - Verify the Docker build command completes successfully
+   - Look for any Docker build errors in the logs
