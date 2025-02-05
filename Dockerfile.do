@@ -1,11 +1,12 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+# Use Python 3.13 image
+FROM python:3.13-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8080 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    DJANGO_SETTINGS_MODULE=afro_renaissance.settings
 
 # Set work directory
 WORKDIR /app
@@ -19,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 # Upgrade pip and install build tools
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install Python dependencies
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -38,7 +39,7 @@ RUN python manage.py migrate --noinput
 # Create a script to run the application
 RUN echo '#!/bin/bash\n\
 cd /app\n\
-exec gunicorn --chdir /app afro_renaissance.wsgi:application \
+python -m gunicorn afro_renaissance.wsgi:application \
     --bind 0.0.0.0:$PORT \
     --workers 3 \
     --threads 2 \
