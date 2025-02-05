@@ -1,0 +1,20 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Docker files (we're using buildpacks)
+Dockerfile
+docker-compose.yml
+nginx/
+
+# Development files
+*.pyc
+__pycache__
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.env.local
