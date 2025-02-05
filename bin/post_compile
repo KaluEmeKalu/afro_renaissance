@@ -8,9 +8,15 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Install package in development mode
-echo "-----> Installing package in development mode"
-pip install -e .
+# Print database URL for debugging (masking sensitive info)
+if [ -n "$DATABASE_URL" ]; then
+    echo "DATABASE_URL is set"
+    # Extract host from DATABASE_URL
+    DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\).*/\1/p')
+    echo "Database host: $DB_HOST"
+else
+    echo "WARNING: DATABASE_URL is not set"
+fi
 
 # Create necessary directories
 mkdir -p staticfiles mediafiles

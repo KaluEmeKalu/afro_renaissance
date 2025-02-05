@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -93,13 +94,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 
 # Database configuration
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/afro_renaissance',
-        conn_max_age=600,
-        ssl_require=False
-    )
-}
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    print("WARNING: DATABASE_URL environment variable is not set!", file=sys.stderr)
+    print("Using default SQLite database for development", file=sys.stderr)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    print(f"Using database URL: {database_url.split('@')[1]}", file=sys.stderr)  # Only print host part
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not DEBUG,
+        )
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
