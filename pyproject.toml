@@ -5,8 +5,5 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "afro_renaissance"
 version = "1.0.0"
-dependencies = []  # dependencies are handled by requirements.txt
-
-[tool.setuptools]
-packages = ["afro_renaissance"]
-include-package-data = true
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
