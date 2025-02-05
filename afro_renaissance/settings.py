@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'afro_renaissance.wsgi.application'
 # Database configuration
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://afro_renaissance_user:change-this-in-production@db:5432/afro_renaissance_db',
+        default='postgres://postgres:postgres@localhost:5432/afro_renaissance',
         conn_max_age=600
     )
 }
@@ -125,8 +125,7 @@ USE_TZ = True
 # Static files configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = []  # We'll create static dirs as needed
 
 # Media files configuration
 MEDIA_URL = '/media/'
@@ -153,8 +152,9 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
-ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = None
+ACCOUNT_RATE_LIMITS = {
+    'login_failed': None,
+}
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
