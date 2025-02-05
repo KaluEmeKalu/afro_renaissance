@@ -3,7 +3,16 @@ from setuptools import setup, find_packages
 setup(
     name="afro_renaissance",
     version="1.0.0",
-    packages=find_packages(),
+    packages=find_packages(include=[
+        'afro_renaissance',
+        'afro_renaissance.*',
+        'blog',
+        'blog.*',
+        'manifesto',
+        'manifesto.*',
+        'social',
+        'social.*'
+    ]),
     include_package_data=True,
     install_requires=[
         line.strip()
