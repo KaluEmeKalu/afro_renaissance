@@ -39,15 +39,9 @@ RUN python manage.py migrate --noinput
 # Create a script to run the application
 RUN echo '#!/bin/bash\n\
 cd /app\n\
-python -m gunicorn afro_renaissance.wsgi:application \
-    --bind 0.0.0.0:$PORT \
-    --workers 3 \
-    --threads 2 \
-    --log-level debug \
-    --access-logfile - \
-    --error-logfile - \
-    --capture-output \
-    --enable-stdio-inheritance' > /app/run.sh \
+exec gunicorn \
+    --config gunicorn.conf.py \
+    afro_renaissance.wsgi:application' > /app/run.sh \
     && chmod +x /app/run.sh
 
 # Run the application
