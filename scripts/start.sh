@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Add the project root to PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:/app
+
 echo "Running migrations..."
 python manage.py migrate --noinput
 
@@ -18,4 +21,4 @@ else:
 EOF
 
 echo "Starting Gunicorn..."
-gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -
+cd /app && exec gunicorn wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -
