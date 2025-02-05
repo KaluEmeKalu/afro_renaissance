@@ -3,47 +3,28 @@ set -eo pipefail
 
 echo "-----> Running post-compile hook"
 
-# Print environment for debugging
+# Print environment and directory structure for debugging
 echo "Current directory: $(pwd)"
-echo "HOME: $HOME"
-echo "PYTHONPATH: $PYTHONPATH"
-echo "Listing directory contents:"
+echo "Directory contents:"
 ls -la
 
-# Create necessary directories
-mkdir -p staticfiles mediafiles
+echo "Parent directory contents:"
+ls -la ..
 
-# Find manage.py
-MANAGE_PATH="./manage.py"
-if [ ! -f "$MANAGE_PATH" ]; then
-    echo "Looking for manage.py in parent directory..."
-    MANAGE_PATH="../manage.py"
-fi
+echo "Root directory contents:"
+ls -la /
 
-if [ ! -f "$MANAGE_PATH" ]; then
-    echo "Error: Could not find manage.py"
-    exit 1
-fi
+echo "Checking Python path:"
+which python
+python --version
 
-echo "Found manage.py at: $MANAGE_PATH"
+echo "Checking if we're in a virtualenv:"
+python -c "import sys; print('Virtual env:', hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))"
 
-# Run migrations
-echo "-----> Running database migrations"
-python $MANAGE_PATH migrate --noinput
+# Try to locate our application files
+echo "Looking for Django files:"
+find . -name "wsgi.py" -o -name "manage.py" -o -name "settings.py" 2>/dev/null
 
-# Collect static files
-echo "-----> Collecting static files"
-python $MANAGE_PATH collectstatic --noinput
-
-# Create superuser if needed
-echo "-----> Creating superuser if not exists"
-python $MANAGE_PATH shell << EOF
-from django.contrib.auth.models import User
-if not User.objects.filter(username='${DJANGO_SUPERUSER_USERNAME}').exists():
-    User.objects.create_superuser('${DJANGO_SUPERUSER_USERNAME}', '${DJANGO_SUPERUSER_EMAIL}', '${DJANGO_SUPERUSER_PASSWORD}')
-    print('Superuser created successfully')
-else:
-    print('Superuser already exists')
-EOF
-
-echo "-----> Post-compile hook completed"
+# Exit early for now to inspect the environment
+echo "Exiting early to inspect environment"
+exit 1
