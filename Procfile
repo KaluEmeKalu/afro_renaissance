@@ -1,1 +1,1 @@
-web: cd $HOME && ls -la && gunicorn --pythonpath $HOME afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --threads 2 --log-level debug --access-logfile - --error-logfile -
+web: /app/.heroku/python/bin/python -m gunicorn afro_renaissance.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --threads 2 --log-level debug --access-logfile - --error-logfile -
