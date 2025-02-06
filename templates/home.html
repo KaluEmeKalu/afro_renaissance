@@ -98,24 +98,25 @@
                                      alt="{{ social_post.author.username|default:'Anonymous' }}"
                                      class="rounded-circle me-2"
                                      style="width: 40px; height: 40px;">
-                               <div>
-                                   <h6 class="mb-0">{{ social_post.author.username|default:'Anonymous' }}</h6>
-                                   <small class="text-muted">{{ social_post.created_at|timesince }} ago</small>
-                               </div>
-                           </div>
-                           <p>{{ social_post.content }}</p>
-                           <div class="d-flex gap-3">
-                               <button class="btn btn-sm btn-outline-primary">
-                                   <i class="far fa-heart"></i> {{ social_post.likes.count|default:"0" }}
-                               </button>
-                               <button class="btn btn-sm btn-outline-primary">
-                                   <i class="far fa-comment"></i> {{ social_post.comments.count|default:"0" }}
-                               </button>
-                           </div>
-                       </div>
-                    {% empty %}
-                    <p class="text-center">No social posts yet. Be the first to share!</p>
-                    {% endfor %}
+                                <div>
+                                    <h6 class="mb-0">{{ social_post.author.username|default:'Anonymous' }}</h6>
+                                    <small class="text-muted">{{ social_post.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                            <p>{{ social_post.content }}</p>
+                            <div class="d-flex gap-3">
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="far fa-heart"></i> {{ social_post.likes.count|default:"0" }}
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="far fa-comment"></i> {{ social_post.comments.count|default:"0" }}
+                                </button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center">No social posts yet. Be the first to share!</p>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="text-center mt-4">
                     <a href="{% url 'social:feed' %}" class="btn btn-primary">View Full Social Feed</a>
