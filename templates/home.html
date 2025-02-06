@@ -70,7 +70,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ blog_post.title }}</h5>
                         <p class="card-text">{{ blog_post.excerpt }}</p>
-                        <a href="{% url 'blog:detail' blog_post.slug %}" class="btn btn-primary">Read More</a>
+                        <a href="{% url 'blog:post_detail' blog_post.id %}" class="btn btn-primary">Read More</a>
                     </div>
                 </div>
             </div>
