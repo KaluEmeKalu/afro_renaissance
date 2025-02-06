@@ -66,11 +66,13 @@ MIDDLEWARE = [
 # CORS and CSRF settings
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
+    'https://hammerhead-app-zwj4j.ondigitalocean.app',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080',
+    'https://hammerhead-app-zwj4j.ondigitalocean.app',
 ]
 
 ROOT_URLCONF = 'afro_renaissance.urls'
