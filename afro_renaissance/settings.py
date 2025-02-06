@@ -19,7 +19,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-secret-key-change-in-productio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['hammerhead-app-zwj4j.ondigitalocean.app', 'localhost', '127.0.0.1']
+if os.getenv('DJANGO_ALLOWED_HOSTS'):
+    ALLOWED_HOSTS.extend(os.getenv('DJANGO_ALLOWED_HOSTS').split(','))
 
 # Application definition
 INSTALLED_APPS = [
