@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
-class Section(models.Model):
+class ManifestoSection(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     order = models.IntegerField(default=0)
@@ -11,6 +11,8 @@ class Section(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = 'Manifesto Section'
+        verbose_name_plural = 'Manifesto Sections'
 
     def save(self, *args, **kwargs):
         if not self.slug:
