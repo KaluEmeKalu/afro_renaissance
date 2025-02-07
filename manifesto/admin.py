@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Section
+from .models import ManifestoSection
 
-@admin.register(Section)
-class SectionAdmin(admin.ModelAdmin):
+@admin.register(ManifestoSection)
+class ManifestoSectionAdmin(admin.ModelAdmin):
     list_display = ('title', 'order', 'created_at', 'updated_at')
     list_filter = ('created_at', 'updated_at')
     search_fields = ('title', 'content')
